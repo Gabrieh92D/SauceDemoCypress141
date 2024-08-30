@@ -1,40 +1,151 @@
-describe('Selecionar Produtos', () =>{
-//atributos
+import 'cypress-xpath'
+ 
+describe('Selecionar Produtos', () => {
+  // atributos
+  const massa = require('../fixtures/massa')
+ 
+  beforeEach(() => {
+    cy.visit('/')       // abre o browser na url informada em cypress.config.js
+  }) // termina before
+ 
+  it('Selecionar Sauce Labs Backpack', () => {
+ 
+    cy.title()          // verifica se o título da página é Swag Labs
+        .should('eq', 'Swag Labs')
+ 
+    // realizar o login
+    cy.get('input[data-test="username"]') // preenche o usuário
+        .type('standard_user')
+ 
+    cy.get('#password')
+        .type('secret_sauce')             // preenche a senha
+ 
+    cy.get('input[name="login-button"]')
+        .click()                          // clica no botão Login
+ 
+    // carregar a pagina de inventário  
+   
+    cy.get('span.title')
+        .should('have.text', 'Products')  // verifica se o elemento contém Products
+ 
+    cy.get('img[alt="Sauce Labs Backpack"]')
+        .click()  // clica na imagem do produto mochila
+ 
+    // carregar a pagina de item de inventário
+ 
+    // apenas para demonstrar como fariamos com Xpath Absoluto
+    // verifica se no elemento via XPath contém o texto Back to products
+    // Tem pelo menos 7 formas mais práticas e legiveis do que isso ...
+    cy.xpath('/html/body/div/div/div/div[1]/div[2]/div/button')
+    // cy.xpath('/html/body/div/div/div/div[1]/div[2]/div/button')
+        .should('have.text', 'Back to products')
+ 
+    cy.get('div.inventory_details_name.large_size') // Verifica titulo
+        .should('have.text', 'Sauce Labs Backpack')
+ 
+    cy.get('div.inventory_details_price') // Verifica preço
+        .should('have.text', '$29.99')
+ 
+    cy.get('#add-to-cart')
+        .click()  // clica no botão Adicionar no Carrinho
+ 
+    cy.get('a.shopping_cart_link')
+        .should('have.text', '1') // verifica se no carrinho exibe o nº 1
+        .click()                  //clica para ir para o carrinho
+    
+    cy.get('span.title')
+        .should('have.text', 'Your Cart')      // verifica o titulo da seção
+ 
+    cy.get('div.inventory_item_name')
+        .should('have.text', 'Sauce Labs Backpack')  // verifica o titulo do produto
+ 
+    cy.get('div.inventory_item_price')
+        .should('have.text', '$29.99')               // verifica o preço do produto
+ 
+    cy.get('div.cart_quantity')
+        .should('have.text', '1')                    // verifica a quantidade
+ 
+  }) //termina o it
 
-beforeEach(() => {
-cy.visit('/')          //abre o browser na url informada em cypress.config.js
-  })//termina before
+  massa.array.forEach(({ username, productName, productPrice})=> {
+  
+  it(`Selecionar ${productName} - Usuario: ${username}`, () => {
+ 
+    cy.title()          // verifica se o título da página é Swag Labs
+        .should('eq', 'Swag Labs')
+ 
+    // realizar o login
+    cy.get('input[data-test="username"]') // preenche o usuário
+        .type(username)
+ 
+    cy.get('#password')
+        .type('secret_sauce')             // preenche a senha
+ 
+    cy.get('input[name="login-button"]')
+        .click()                          // clica no botão Login
+ 
+    // carregar a pagina de inventário  
+   
+    cy.get('span.title')
+        .should('have.text', 'Products')  // verifica se o elemento contém Products
+ 
+    cy.get(`img[alt="${productName}"]`)
+        .click()  // clica na imagem do produto mochila
+ 
+    // carregar a pagina de item de inventário
+ 
+    // apenas para demonstrar como fariamos com Xpath Absoluto
+    // verifica se no elemento via XPath contém o texto Back to products
+    // Tem pelo menos 7 formas mais práticas e legiveis do que isso ...
+    cy.xpath('/html/body/div/div/div/div[1]/div[2]/div/button')
+    // cy.xpath('/html/body/div/div/div/div[1]/div[2]/div/button')
+        .should('have.text', 'Back to products')
+ 
+    cy.get('div.inventory_details_name.large_size') // Verifica titulo
+        .should('have.text', productName)
+ 
+    cy.get('div.inventory_details_price') // Verifica preço
+        .should('have.text', productPrice)
+ 
+    cy.get('#add-to-cart')
+        .click()  // clica no botão Adicionar no Carrinho
+ 
+    cy.get('a.shopping_cart_link')
+        .should('have.text', '1') // verifica se no carrinho exibe o nº 1
+        .click()                  //clica para ir para o carrinho
+    
+    cy.get('span.title')
+        .should('have.text', 'Your Cart')      // verifica o titulo da seção
+ 
+    cy.get('div.inventory_item_name')
+        .should('have.text', productName)  // verifica o titulo do produto
+ 
+    cy.get('div.inventory_item_price')
+        .should('have.text', productPrice)               // verifica o preço do produto
+ 
+    cy.get('div.cart_quantity')
+        .should('have.text', '1')                    // verifica a quantidade
+ 
+  }) //termina o it
+  })//terminjar foreach
+  
+/*
+  afterEach(()=>{
+    cy.get('#remove-sauce-labs-backpack')
+        .click()
+    
+     cy.get('#react-burger-menu-btn')
+      .click()
 
-  it('Selecionar Sauce Labs Backpack', () =>{
-     cy.title() // verifica se o tituçlo da pagina é swag labs
-      .should('eq', 'Swag Labs')
-     cy.get('input[data-test="username"]') //preenche o usuario
-      .type('standard_user')
-     cy.get('#password')
-      .type('secret_sauce')   //preenche a senha
-
-      cy.get('input[name="login-button"]')
-        .click()    ///clica no botão login
-
-        //carregar a pagina interna
-      cy.get('span.title')
-          .should('have.text', 'Products')
-      cy.get('img[alt="Sauce Labs Backpack"]')
+    
+    cy.get('#logout_sidebar_link', {timeout: 1000})
+        .should('be.visible')
+      //  .should('not.be.disabled')
         .click()
 
-      cy.xpath('/html/body/div/div/div/div[2]/div[2]/div/button')
-        .click('have.text', 'Back to products');
-      
-      cy.get('div.inventory_details_name.large_size')
-        .should('have.text', 'Sauce Labs Backpack')   
-
-      cy.get('div.inventory_details_price')
-        .should('have.text', '$29.99')    
-
-      cy.get('#add-to-cart')
-        .click() 
-      
-      cy.get('a.shopping_cart_link')
-        .should('have.text', '1')
-  })
-})//termina desibe
+    //cy.get('#logout-button')
+      //  .should('be.visible')    
+  }) //terminar aftereach
+ */
+ 
+}) // termina describe
